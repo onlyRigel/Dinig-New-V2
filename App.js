@@ -11,12 +11,9 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Switch, Slider } from 'react-native';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
-import { OPENAI_API_KEY } from '@env';
 
 // Create drawer navigator
 const Drawer = createDrawerNavigator();
-
-const apiKey = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
 const translateTextWithOpenAI = async (inputText, sourceLang, targetLang, setTranslatedText) => {
@@ -24,8 +21,11 @@ const translateTextWithOpenAI = async (inputText, sourceLang, targetLang, setTra
     Alert.alert("Error", "Please enter text to translate.");
     return;
   }
+
+   try {
+    // Debug: check if key is loaded properly
+    console.log("API Key starts with:", OPENAI_API_KEY ? `${OPENAI_API_KEY.substring(0, 3)}...` : "undefined");
     
-  try {
     const requestBody = {
       model: "gpt-3.5-turbo",
       messages: [
@@ -44,7 +44,7 @@ const translateTextWithOpenAI = async (inputText, sourceLang, targetLang, setTra
 
     setTranslatedText(response.data.choices[0].message.content.trim());
   } catch (error) {
-    console.error("Translation error:", error);
+    console.error("Translation error details:", error.response ? error.response.data : error.message);
     Alert.alert("Error", "Failed to translate text.");
   }
 };
