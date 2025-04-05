@@ -8,9 +8,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Ionicons, FontAwesome, MaterialIcons, Feather } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Switch, Slider } from 'react-native';
+import { Switch } from 'react-native';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
+import Slider from '@react-native-community/slider';
+import { useNavigation } from '@react-navigation/native';
+
 
 // Create drawer navigator
 const Drawer = createDrawerNavigator();
@@ -60,6 +63,7 @@ function TranslationScreen({ navigation }) {
     setSelectedLanguage1(selectedLanguage2);
     setSelectedLanguage2(selectedLanguage1);
   };
+  
 
   const clearText = () => {
     setText('');
@@ -247,87 +251,89 @@ function TriviaScreen() {
   );
 }
 
-// Settings Screen Component
-function SettingsScreen() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [dailyTips, setDailyTips] = useState(true);
-  const [dataCollection, setDataCollection] = useState(true);
-  const [textSize, setTextSize] = useState(0.5);
-  const [voiceCommands, setVoiceCommands] = useState(true);
+  // Settings Screen Component
+  function SettingsScreen() {
+    const [darkMode, setDarkMode] = useState(false);
+    const [dailyTips, setDailyTips] = useState(true);
+    const [dataCollection, setDataCollection] = useState(true);
+    const [textSize, setTextSize] = useState(0.5);
+    const [voiceCommands, setVoiceCommands] = useState(true);
 
-  return (
-    <SafeAreaView style={styles.settingsContainer}>
-      <View style={styles.settingsCard}>
-        <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Dark Mode</Text>
-          <Switch
-            value={darkMode}
-            onValueChange={setDarkMode}
-            trackColor={{ false: "#e0e0e0", true: "#81b0ff" }}
-            thumbColor={darkMode ? "#2196F3" : "#f4f3f4"}
+    return (
+
+      <SafeAreaView style={styles.settingsContainer}>
+        <View style={styles.header}>
+  <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+    <Ionicons name="arrow-back" size={24} color="#000" />
+  </TouchableOpacity>
+  <Text style={styles.headerTitle}>Settings</Text>
+</View>
+
+        <View style={styles.settingsCard}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Dark Mode</Text>
+            <Switch
+              value={darkMode}
+              onValueChange={setDarkMode}
+              trackColor={{ false: "#e0e0e0", true: "#81b0ff" }}
+              thumbColor={darkMode ? "#2196F3" : "#f4f3f4"}
+            />
+          </View>
+          
+          <Text style={styles.settingHeader}>Notification Settings</Text>
+          <View style={styles.settingRow}>
+            <View style={styles.checkboxRow}>
+           
+              <Text style={styles.settingLabel}>Receive Daily Language Tips</Text>
+            </View>
+            <TouchableOpacity onPress={() => setDailyTips(!dailyTips)}>
+              <View style={[styles.checkbox, dailyTips && styles.checkboxChecked]}>
+                {dailyTips && <Feather name="check" size={16} color="white" />}
+              </View>
+            </TouchableOpacity>
+          </View>
+          
+          <Text style={styles.settingHeader}>Privacy Settings</Text>
+          <View style={styles.settingRow}>
+            <View style={styles.checkboxRow}>
+           
+              <Text style={styles.settingLabel}>Allow Data Collection</Text>
+            </View>
+            <TouchableOpacity onPress={() => setDataCollection(!dataCollection)}>
+              <View style={[styles.checkbox, dataCollection && styles.checkboxChecked]}>
+                {dataCollection && <Feather name="check" size={16} color="white" />}
+              </View>
+            </TouchableOpacity>
+          </View>
+          
+          <Text style={styles.settingHeader}>Accessibility Options</Text>
+          <Text style={styles.settingLabel}>Text Size</Text>
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={1}
+            value={textSize}
+            onValueChange={setTextSize}
+            minimumTrackTintColor="#009688"
+            maximumTrackTintColor="#e0e0e0"
+            thumbTintColor="#009688"
           />
-        </View>
+          
+          <View style={styles.settingRow}>
+            <View style={styles.checkboxRow}>
         
-        <Text style={styles.settingHeader}>Notification Settings</Text>
-        <View style={styles.settingRow}>
-          <View style={styles.checkboxRow}>
-            <View style={[styles.checkbox, dailyTips && styles.checkboxChecked]}>
-              {dailyTips && <Feather name="check" size={16} color="white" />}
+              <Text style={styles.settingLabel}>Enable Voice Commands</Text>
             </View>
-            <Text style={styles.settingLabel}>Receive Daily Language Tips</Text>
+            <TouchableOpacity onPress={() => setVoiceCommands(!voiceCommands)}>
+              <View style={[styles.checkbox, voiceCommands && styles.checkboxChecked]}>
+                {voiceCommands && <Feather name="check" size={16} color="white" />}
+              </View>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => setDailyTips(!dailyTips)}>
-            <View style={[styles.checkbox, dailyTips && styles.checkboxChecked]}>
-              {dailyTips && <Feather name="check" size={16} color="white" />}
-            </View>
-          </TouchableOpacity>
         </View>
-        
-        <Text style={styles.settingHeader}>Privacy Settings</Text>
-        <View style={styles.settingRow}>
-          <View style={styles.checkboxRow}>
-            <View style={[styles.checkbox, dataCollection && styles.checkboxChecked]}>
-              {dataCollection && <Feather name="check" size={16} color="white" />}
-            </View>
-            <Text style={styles.settingLabel}>Allow Data Collection</Text>
-          </View>
-          <TouchableOpacity onPress={() => setDataCollection(!dataCollection)}>
-            <View style={[styles.checkbox, dataCollection && styles.checkboxChecked]}>
-              {dataCollection && <Feather name="check" size={16} color="white" />}
-            </View>
-          </TouchableOpacity>
-        </View>
-        
-        <Text style={styles.settingHeader}>Accessibility Options</Text>
-        <Text style={styles.settingLabel}>Text Size</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={1}
-          value={textSize}
-          onValueChange={setTextSize}
-          minimumTrackTintColor="#009688"
-          maximumTrackTintColor="#e0e0e0"
-          thumbTintColor="#009688"
-        />
-        
-        <View style={styles.settingRow}>
-          <View style={styles.checkboxRow}>
-            <View style={[styles.checkbox, voiceCommands && styles.checkboxChecked]}>
-              {voiceCommands && <Feather name="check" size={16} color="white" />}
-            </View>
-            <Text style={styles.settingLabel}>Enable Voice Commands</Text>
-          </View>
-          <TouchableOpacity onPress={() => setVoiceCommands(!voiceCommands)}>
-            <View style={[styles.checkbox, voiceCommands && styles.checkboxChecked]}>
-              {voiceCommands && <Feather name="check" size={16} color="white" />}
-            </View>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
-  );
-}
+      </SafeAreaView>
+    );
+  }
 
 // Custom Drawer Content
 function CustomDrawerContent({ navigation }) {
@@ -406,7 +412,7 @@ export default function App() {
             headerShown: false,
             drawerStyle: {
               backgroundColor: '#ADD8E6',
-              width: '100%',
+              width: '70%',
             },
           }}
         >
@@ -601,6 +607,7 @@ const styles = StyleSheet.create({
   drawerContainer: {
     flex: 1,
     backgroundColor: '#ADD8E6',
+    paddingTop: 40,
   },
   drawerHeader: {
     flexDirection: 'row',
@@ -647,6 +654,16 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
+  
+backButton: {
+  marginRight: 15,
+  padding: 5,
+},
+
+headerTitle: {
+  fontSize: 20,
+  fontWeight: 'bold',
+},
   settingsCard: {
     flex: 1,
     backgroundColor: 'white',
