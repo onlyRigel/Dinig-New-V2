@@ -127,16 +127,24 @@ function TranslationScreen({ navigation }) {
         {/* Text Output Area */}
         <View style={styles.textOutputContainer}>
           <TextInput style={styles.textOutput} multiline value={translatedText} editable={false} />
-          <TouchableOpacity onPress={copyToClipboard} style={styles.copyButton}>
-            <Image source={require('./assets/copy.png')} style={styles.copyIcon} />
-          </TouchableOpacity>
+         
         </View>
 
-        {/* Trash button inside the translation container */}
-        <TouchableOpacity onPress={clearText} style={styles.trashButton}>
-          <Image source={require('./assets/trash.png')} style={styles.trashIcon} />
-        </TouchableOpacity>
+     {/* Action Buttons Container */}
+<View style={styles.actionButtonsContainer}>
+  {/* Copy Button */}
+  <TouchableOpacity onPress={copyToClipboard} style={styles.copyButton}>
+    <Image source={require('./assets/copy.png')} style={styles.copyIcon} />
+  </TouchableOpacity>
+
+  {/* Trash Button */}
+  <TouchableOpacity onPress={clearText} style={styles.trashButton}>
+    <Image source={require('./assets/trash.png')} style={styles.trashIcon} />
+  </TouchableOpacity>
+</View>
       </View>
+
+
 
       {/* Bottom Navigation Bar */}
       <View style={styles.navBar}>
@@ -527,26 +535,35 @@ const styles = StyleSheet.create({
     color: 'black',
     paddingRight: 40, // Add padding to prevent text from going under the copy button
   },
+  actionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  
   copyButton: {
-    position: 'absolute', // Position absolutely
-    bottom: 10, // Position at bottom
-    right: 10, // Position at right
-    zIndex: 1, // Ensure it's above the text
+    padding: 3,
+    borderRadius: 8,
+    marginLeft: 250,
   },
-  copyIcon: {
-    width: 30,
-    height: 30,
-  },
+  
   trashButton: {
-    position: 'absolute', // Position absolutely
-    bottom: 10, // Position at bottom
-    right: 10, // Position at right
-    zIndex: 1, // Ensure it's above other elements
+    padding: 3,
+    borderRadius: 8,
+  
   },
+  
+  copyIcon: {
+    width: 24,
+    height: 24,
+  },
+  
   trashIcon: {
-    width: 30,
-    height: 30,
+    width: 24,
+    height: 24,
   },
+  
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
