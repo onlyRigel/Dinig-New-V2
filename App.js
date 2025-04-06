@@ -15,6 +15,8 @@ import Slider from '@react-native-community/slider';
 import { useNavigation } from '@react-navigation/native';
 import Voice from '@react-native-voice/voice';
 import { useEffect } from 'react';
+import { BackHandler } from 'react-native';
+
 
 // Create drawer navigator
 const Drawer = createDrawerNavigator();
@@ -54,11 +56,12 @@ const translateTextWithOpenAI = async (inputText, sourceLang, targetLang, setTra
 };
 
 // Main Translation Screen Component
-function TranslationScreen({ navigation }) {
+function TranslationScreen() {
   const [selectedLanguage1, setSelectedLanguage1] = useState('English');
   const [selectedLanguage2, setSelectedLanguage2] = useState('Tagalog');
   const [text, setText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
+  const navigation = useNavigation();
 
 
 
@@ -175,19 +178,25 @@ function TranslationScreen({ navigation }) {
 
 
       {/* Bottom Navigation Bar */}
-            <View style={styles.navBar}>
-            <TouchableOpacity style={styles.navButton} onPress={startListening}>
-        <Image source={require('./assets/mic.png')} style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Speak</Text>
-      </TouchableOpacity>
+      <View style={styles.navBar}>
+  <TouchableOpacity style={styles.navButton} onPress={startListening}>
+    <Image source={require('./assets/mic.png')} style={styles.buttonIcon} />
+    <Text style={styles.buttonText}>Speak</Text>
+  </TouchableOpacity>
+
         <TouchableOpacity onPress={() => translateTextWithOpenAI(text, selectedLanguage1, selectedLanguage2, setTranslatedText)} style={styles.translateButton}>
           <Image source={require('./assets/translate.png')} style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Translate</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('TwoWayScreen')}>
-         <Image source={require('./assets/people.png')} style={styles.buttonIcon} /> 
-          <Text style={styles.buttonText}>Two-Way</Text>
-        </TouchableOpacity>
+ 
+        <TouchableOpacity
+    style={styles.navButton}
+    onPress={() => navigation.navigate('TwoWay')}
+  >
+    <Image source={require('./assets/people.png')} style={styles.buttonIcon} />
+    <Text style={styles.buttonText}>Two-Way</Text>
+  </TouchableOpacity>
+
 
         <TouchableOpacity style={styles.navButton}>
           <Image source={require('./assets/history.png')} style={styles.buttonIcon} />
@@ -399,6 +408,24 @@ function TriviaScreen() {
 
 // Custom Drawer Content
 function CustomDrawerContent({ navigation }) {
+
+  const exitApp = () => {
+    BackHandler.exitApp();
+  };
+
+  
+  const confirmExit = () => {
+    Alert.alert(
+      'Exit App',
+      'Are you sure you want to exit?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Exit', onPress: () => BackHandler.exitApp() }
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View style={styles.drawerContainer}>
       <View style={styles.drawerHeader}>
@@ -449,15 +476,18 @@ function CustomDrawerContent({ navigation }) {
           <Text style={styles.drawerItemText}>Trivia of the Day</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity 
+              
+      <TouchableOpacity 
           style={styles.drawerItem} 
-          onPress={() => console.log('Exit app')}
+          onPress={confirmExit}
         >
           <View style={styles.iconContainer}>
             <MaterialIcons name="exit-to-app" size={24} color="black" />
           </View>
           <Text style={styles.drawerItemText}>Exit</Text>
         </TouchableOpacity>
+
+
       </View>
     </View>
   );
