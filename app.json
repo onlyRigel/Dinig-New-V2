@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/splash-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.DINIG"
     },
     "web": {
       "favicon": "./assets/favicon.png"

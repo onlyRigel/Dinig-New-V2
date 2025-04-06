@@ -6,14 +6,15 @@ import axios from "axios";
 import * as Clipboard from 'expo-clipboard';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Ionicons, FontAwesome, MaterialIcons, Feather } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, MaterialIcons,MaterialCommunityIcons , Feather } from '@expo/vector-icons';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Switch } from 'react-native';
 import 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import Slider from '@react-native-community/slider';
 import { useNavigation } from '@react-navigation/native';
-
+import Voice from '@react-native-voice/voice';
+import { useEffect } from 'react';
 
 // Create drawer navigator
 const Drawer = createDrawerNavigator();
@@ -58,6 +59,29 @@ function TranslationScreen({ navigation }) {
   const [selectedLanguage2, setSelectedLanguage2] = useState('Tagalog');
   const [text, setText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
+
+
+
+  useEffect(() => {
+    Voice.onSpeechResults = onSpeechResultsHandler;
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
+
+  const onSpeechResultsHandler = (e) => {
+    const spokenText = e.value[0];
+    setText(spokenText);
+  };
+
+  const startListening = async () => {
+    try {
+      await Voice.start('en-US'); // You can change language based on selectedLanguage1
+    } catch (e) {
+      console.error('Voice start error:', e);
+    }
+  };
+
 
   const swapLanguages = () => {
     setSelectedLanguage1(selectedLanguage2);
@@ -151,19 +175,20 @@ function TranslationScreen({ navigation }) {
 
 
       {/* Bottom Navigation Bar */}
-      <View style={styles.navBar}>
-        <TouchableOpacity style={styles.navButton}>
-          <Image source={require('./assets/mic.png')} style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Speak</Text>
-        </TouchableOpacity>
+            <View style={styles.navBar}>
+            <TouchableOpacity style={styles.navButton} onPress={startListening}>
+        <Image source={require('./assets/mic.png')} style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Speak</Text>
+      </TouchableOpacity>
         <TouchableOpacity onPress={() => translateTextWithOpenAI(text, selectedLanguage1, selectedLanguage2, setTranslatedText)} style={styles.translateButton}>
           <Image source={require('./assets/translate.png')} style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Translate</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton}>
-          <Image source={require('./assets/people.png')} style={styles.buttonIcon} />
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('TwoWayScreen')}>
+         <Image source={require('./assets/people.png')} style={styles.buttonIcon} /> 
           <Text style={styles.buttonText}>Two-Way</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.navButton}>
           <Image source={require('./assets/history.png')} style={styles.buttonIcon} />
           <Text style={styles.buttonText}>History</Text>
@@ -174,6 +199,40 @@ function TranslationScreen({ navigation }) {
     </View>
   );
 }
+
+
+function TwoWayScreen() {
+  const navigation = useNavigation();
+  return (
+    
+    <View style={twoWayStyles.twoWayContainer}>
+      {/* First Card */}
+      <View style={twoWayStyles.twoWayCard}>
+        <TouchableOpacity style={twoWayStyles.twoWayMicButtonTopLeft}>
+          <MaterialCommunityIcons name="microphone-off" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={twoWayStyles.twoWayLanguageLabel}>Tagalog</Text>
+        <Text style={twoWayStyles.twoWayTextPrompt}>Open mic to talk...</Text>
+        <TouchableOpacity style={twoWayStyles.twoWayTrashIconTopRight}>
+          <Ionicons name="trash-outline" size={20} color="#888" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Second Card */}
+      <View style={twoWayStyles.twoWayCard}>
+        <Text style={twoWayStyles.twoWayLanguageLabel}>English</Text>
+        <Text style={twoWayStyles.twoWayTextPrompt}>Open mic to talk...</Text>
+        <TouchableOpacity style={twoWayStyles.twoWayTrashIconBottomLeft}>
+          <Ionicons name="trash-outline" size={20} color="#888" />
+        </TouchableOpacity>
+        <TouchableOpacity style={twoWayStyles.twoWayMicButtonBottomRight}>
+          <MaterialCommunityIcons name="microphone-off" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 
 // About Screen Component
 function AboutScreen() {
@@ -253,6 +312,7 @@ function TriviaScreen() {
 
   // Settings Screen Component
   function SettingsScreen() {
+    const navigation = useNavigation();
     const [darkMode, setDarkMode] = useState(false);
     const [dailyTips, setDailyTips] = useState(true);
     const [dataCollection, setDataCollection] = useState(true);
@@ -262,12 +322,14 @@ function TriviaScreen() {
     return (
 
       <SafeAreaView style={styles.settingsContainer}>
-        <View style={styles.header}>
-  <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-    <Ionicons name="arrow-back" size={24} color="#000" />
-  </TouchableOpacity>
-  <Text style={styles.headerTitle}>Settings</Text>
-</View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Settings</Text>
+      </View>
+
+
 
         <View style={styles.settingsCard}>
           <View style={styles.settingRow}>
@@ -462,7 +524,7 @@ const styles = StyleSheet.create({
     padding: 30,
     backgroundColor: '#ADD8E6',
     position: 'absolute',
-    top: 40,
+    top: 20,
   },
   headerText: {
     fontSize: 30,
@@ -577,7 +639,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#D69A7A',
     position: 'absolute',
     bottom: 0,
-    padding: 10,
+    padding: 1,
   },
   navButton: {
     alignItems: 'center',
@@ -603,11 +665,72 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+
+  twoWayContainer: {
+    flex: 1,
+    backgroundColor: '#add8f6',
+    justifyContent: 'space-around',
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+  },
+  twoWayCard: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    height: 200,
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  twoWayMicButtonTopLeft: {
+    backgroundColor: '#f4a261',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: -25,
+    left: -25,
+  },
+  twoWayMicButtonBottomRight: {
+    backgroundColor: '#f4a261',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: -25,
+    right: -25,
+  },
+  twoWayTrashIconTopRight: {
+    position: 'absolute',
+    top: -25,
+    right: -25,
+  },
+  twoWayTrashIconBottomLeft: {
+    position: 'absolute',
+    bottom: -25,
+    left: -25,
+  },
+  twoWayLanguageLabel: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+  },
+  twoWayTextPrompt: {
+    color: '#888',
+    fontSize: 16,
+    alignSelf: 'center',
+  },
+
   // Drawer styles
   drawerContainer: {
     flex: 1,
     backgroundColor: '#ADD8E6',
-    paddingTop: 40,
+    paddingTop: 30,
   },
   drawerHeader: {
     flexDirection: 'row',
@@ -651,25 +774,34 @@ const styles = StyleSheet.create({
   settingsContainer: {
     flex: 1,
     backgroundColor: '#ADD8E6',
-    padding: 20,
+    padding: 5,
     paddingTop: 60,
   },
   
 backButton: {
-  marginRight: 15,
-  padding: 5,
+  marginRight: 5,
+  padding: 1,
 },
 
 headerTitle: {
-  fontSize: 20,
+  fontSize: 30,
   fontWeight: 'bold',
+  textAlign: 'center',
+  flex: 1,
 },
-  settingsCard: {
-    flex: 1,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-  },
+settingsCard: {
+  backgroundColor: 'white',
+  borderRadius: 20,
+  padding: 15,
+  marginHorizontal: 20,        // adds side spacing
+  marginTop: 20,               // spacing from top
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 6,
+  elevation: 3,                // shadow for Android
+},
+
   settingRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
